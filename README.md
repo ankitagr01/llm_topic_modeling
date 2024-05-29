@@ -1,3 +1,61 @@
+
+# LLaMA-3 Topic Modeling
+
+This project fine-tunes the LLaMA-3 8B model to generate topics dynamically from abstracts and introductions of arXiv papers. The fine-tuning process is modular, with separate components for data loading, preprocessing, training, and evaluation.
+
+## Project Structure
+
+llama_topic_modeling/
+│
+├── data/
+│   ├── __init__.py
+│   ├── data_loader.py
+│   ├── data_processor.py
+│
+├── models/
+│   ├── __init__.py
+│   ├── model.py
+│
+├── training/
+│   ├── __init__.py
+│   ├── trainer.py
+│
+├── evaluation/
+│   ├── __init__.py
+│   ├── metrics.py
+│
+├── main.py
+├── requirements.txt
+└── README.md
+
+
+
+
+## Installation
+
+1. Clone the repository.
+2. Install the required packages:
+
+```
+pip install -r requirements.txt
+```
+
+## Usage
+Run the main.py script to fine-tune the LLaMA-3 8B model on the arXiv dataset and generate topics dynamically.
+
+```
+python main.py
+```
+
+## Evaluation
+The model is evaluated using BLEU and ROUGE scores to compare the performance of the fine-tuned and pre-trained models.
+
+This codebase should be structured, modular, and easy to manage. You can extend or modify any component as needed. Make sure to have the necessary API keys and access to the UnsloT library for this to work correctly.
+
+
+
+
+
 # SUMM AI NLP Challenge - Topic Modeling with LLM 🚀
 
 ## Objective
