@@ -25,7 +25,8 @@ class TopicGenerator:
         # )
 
 
-        model_name = "meta-llama/Llama-2-13b-hf"
+        # model_name = "meta-llama/Llama-3-13b-hf"
+        model_name = "meta-llama/Meta-Llama-3-8B-Instruct"
         # model_name = "meta-llama/Llama-2-13b-chat-hf"
         # model_name = "meta-llama/Llama-2-7b-chat-hf"
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -35,6 +36,7 @@ class TopicGenerator:
         # self.few_shot_examples = """
         # Abstract: This paper presents a new method for image segmentation using deep learning techniques.
         # Topic: Deep Learning Image Segmentation
+
 
         # Abstract: The study explores the impact of climate change on marine biodiversity.
         # Topic: Climate Change Marine Biodiversity
@@ -90,33 +92,84 @@ class TopicGenerator:
         # {}"""
 
 
-        alpaca_prompt = f"""
-        ### System: You are an AI language model tasked with generating concise topics for academic paper abstracts.
-        ### Instruction: Given the abstract below, generate an appropriate topic.
-        ###
-        ### Abstract:
-        {abstract}
-        ###
-        ### Topic:
-        """
+        # prompt = f"""
+        # ### System: You are an AI language model tasked with generating concise topics for academic paper abstracts.
+        # ### Instruction: Given the abstract below, generate an appropriate topic.
+        # ###
+        # ### Abstract:
+        # {abstract}
+        # ###
+        # ### Based on the text provided above, please propose a short topic appropriate for the text. Make sure you to only return the topic and nothing more.
+        # ###
+        # ### Topic:
+        # """
+
+        # prompt = f"""
+        # <s>[INST] <<SYS>>
+        # You are a helpful, respectful and honest assistant for labeling topics.
+        # <</SYS>>
+
+        # [INST]
+        # See below example of how topic should be generated given an abstract:
+
+        # Abstract: Mesh-based simulations are central to modeling complex physical systems in many disciplines across science and engineering. Mesh representations support powerful numerical integration methods and their resolution can be adapted to strike favorable trade-offs between accuracy and efficiency. However, high-dimensional scientific simulations are very expensive to run, and solvers and parameters must often be tuned individually to each system studied. Here we introduce MeshGraphNets, a framework for learning mesh-based simulations using graph neural networks. Our model can be trained to pass messages on a mesh graph and to adapt the mesh discretization during forward simulation. Our results show it can accurately predict the dynamics of a wide range of physical systems, including aerodynamics, structural mechanics, and cloth. The model's adaptivity supports learning resolution-independent dynamics and can scale to more complex state spaces at test time. Our method is also highly efficient, running 1-2 orders of magnitude faster than the simulation on which it is trained. Our approach broadens the range of problems on which neural network simulators can operate and promises to improve the efficiency of complex, scientific modeling tasks.
+        # Topic: Mesh-Based Simulation with Graph Networks
+
+
+        # [INST]
+        # I want a short topic which appropriately describes the following text:
+        # {abstract}
+
+        # Based on the text provided above and the example, please propose a short topic appropriate for the text. Make sure you to only return the topic and nothing more.
+        # [/INST]
+        # """
+
+
+        # prompt = f"Below is an instruction that describes a task. You are an AI language model tasked with generating concise topics for academic paper abstracts. Given the abstract below, generate an appropriate small topic. Give me response without explaination. \n\n### Instruction:\n Given the abstract below, generate an appropriate small topic. Dont provide any explanation, just return me the small topic. Make sure you to only return the topic and nothing more.\n\nInput:\n{abstract}\n\nMake sure you to only return the topic and nothing more.\n\n### Response:"
+
 
         # prompt = self.system_prompt + self.few_shot_examples + self.main_prompt.format(f"Abstract: {abstract}")
-        prompt = alpaca_prompt.format(f"Abstract: {abstract}")
+        # prompt = alpaca_prompt.format(f"Abstract: {abstract}")
         # response = self.model.generate(prompt, max_length=10, temperature=0.7)
         # return response.strip()
+
+        prompt = f"""
+        <|begin_of_text|><|start_header_id|>system<|end_header_id|>
+
+        You are a helpful and respectful AI assistant for for labeling topics<|eot_id|>
+        <|start_header_id|>user<|end_header_id|>
+        
+        Given the abstract below, generate an appropriate small topic relevant to the abstract. Give me response without explaination.
+        Abstract: {abstract} <|eot_id|>
+
+        <|start_header_id|>assistant<|end_header_id|>
+        """
     
         inputs = self.tokenizer(prompt, return_tensors="pt").to('cuda')
-        outputs = self.model.generate(input_ids=inputs["input_ids"].to("cuda"), attention_mask=inputs["attention_mask"], max_new_tokens=50, pad_token_id=self.tokenizer.eos_token_id)
-        output_text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-        print('output_text', output_text)
-        print('output_text.strip: ', output_text.strip())
+        
+        generated_ids = self.model.generate(inputs.input_ids.cuda(), max_new_tokens=256, do_sample=True, top_p=0.95, temperature=0.8)
+        topic = self.tokenizer.batch_decode(generated_ids)[0]
+        print('topiccc:', topic)
 
-        # Extract the topic from the output
-        topic_marker = "### Topic:"
-        topic_start = output_text.find(topic_marker) + len(topic_marker)
-        topic = output_text[topic_start:].strip().split('\n')[0]
+        #outputs = self.model.generate(input_ids=inputs["input_ids"].to("cuda"), attention_mask=inputs["attention_mask"], max_new_tokens=50, pad_token_id=self.tokenizer.eos_token_id)
+        #output_text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+        # print('output_text', output_text)
+        # print('output_text.strip: ', output_text.strip())
 
-        #return output_text.strip()
+        # # Extract the topic from the output
+        # print('full output: ', output_text)
+        # topic_marker = "### Topic:"
+        # topic_start = output_text.find(topic_marker) + len(topic_marker)
+        # topic = output_text[topic_start:].strip().split('\n')[0]
+
+        # # Extract topic from response
+        # print('full output: ', output_text)
+        # int_idx = output_text.find('Response:')
+        # text_class = output_text[int_idx+len('Response:'):]   
+        # topic = text_class.strip()
+
+        # print('topic: ', topic)
+        # return output_text.strip()
         return topic
 
     def generate_topics(self, abstracts: List[str], introductions: List[str]) -> List[str]:
