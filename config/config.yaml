@@ -31,7 +31,7 @@ training:
 
 data:
   dataset_name: "CShorten/ML-ArXiv-Papers"
-  test_size: 0.2
-  val_size: 0.25
+  test_size: 0.05
+  val_size: 0.1
   generated_topics_file: "generated_topics.csv"
 

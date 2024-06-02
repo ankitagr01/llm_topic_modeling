@@ -1,3 +1,16 @@
+import sys
+import subprocess
+import os
+
+# subprocess.check_call([sys.executable, "-m", "pip", "install", "transformers"])
+# subprocess.check_call([sys.executable, "-m", "pip", "install", "datasets"])
+# subprocess.check_call([sys.executable, "-m", "pip", "install", "accelerate"])
+# subprocess.check_call([sys.executable, "-m", "pip", "install", "peft"])
+# subprocess.check_call([sys.executable, "-m", "pip", "install", "bitsandbytes"])
+# subprocess.check_call([sys.executable, "-m", "pip", "install", "wandb"])
+# subprocess.check_call([sys.executable, "-m", "pip", "install", "trl"])
+# subprocess.check_call([sys.executable, "-m", "pip", "install", "scikit-learn"])
+
 import os
 from data.data_loader import DataLoader
 from data.data_processor import DataProcessor
@@ -21,16 +34,17 @@ def main():
 
     # Load and preprocess data
     data_loader = DataLoader(dataset_name=config['data']['dataset_name'], topics_file=config['data']['generated_topics_file'])
-    abstracts, titles, introductions = data_loader.get_data()
+    abstracts, titles = data_loader.get_data()
 
     # Generate or load topics
     if os.path.exists(config['data']['generated_topics_file']):
         topics = data_loader.load_topics()
     else:
         topic_generator = TopicGenerator(model_name=config['model']['teacher_model_name'])
-        topics = topic_generator.generate_topics(abstracts, introductions)
+        topics = topic_generator.generate_topics(abstracts)
         data_loader.save_topics(topics)
-
+    
+    '''
     # Preprocess data
     data_processor = DataProcessor(model_name="meta-llama/Llama-2-7b-hf", config=config)
     inputs, targets = data_processor.preprocess_data(abstracts, introductions, topics)
@@ -70,7 +84,7 @@ def main():
     topic_model.load_model(config['model']['student_model_name'])  # Reset to pre-trained state
     eval_results_pretrained = trainer.evaluate(dataset=val_dataset, compute_metrics=evaluator.compute_metrics)
     print(f"Pre-trained model evaluation: {eval_results_pretrained}")
-
+    '''
 
 
 if __name__ == "__main__":

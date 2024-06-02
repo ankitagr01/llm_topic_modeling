@@ -27,7 +27,9 @@ class DataProcessor:
             inputs (list): List of combined abstracts and introductions.
             targets (list): List of topics.
         """
-        inputs = [f"{abstract} {introduction}" for abstract, introduction in zip(abstracts, introductions)]
+    
+        # inputs = [f"{abstract} {introduction}" for abstract, introduction in zip(abstracts, introductions)]
+        inputs = abstracts
         targets = topics
         return inputs, targets
 

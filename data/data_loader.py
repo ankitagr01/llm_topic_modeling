@@ -15,10 +15,10 @@ class DataLoader:
     def __init__(self, dataset_name: str, topics_file: str):
         self.dataset = load_dataset(dataset_name)["train"]
         # load only the first 10 samples for testing  # temp AA
-        self.dataset = self.dataset.select(list(range(10)))  # temp AA
+        self.dataset = self.dataset.select(list(range(15000, 16000)))  # temp AA
         self.topics_file = topics_file
 
-    def get_data(self) -> Tuple[List[str], List[str], List[str]]:
+    def get_data(self) -> Tuple[List[str], List[str]]:
         """
         Extracts abstracts, titles, and introductions from the dataset.
 
@@ -29,9 +29,9 @@ class DataLoader:
         """
         abstracts = self.dataset["abstract"]
         titles = self.dataset["title"]
-        introductions = self.dataset["abstract"]   # temp AA
+        # introductions = self.dataset["abstract"]   # temp AA
         # introductions = [section.split('\n')[0] for section in self.dataset["sections"]]  # Assuming the first section is the introduction  #temp AA
-        return abstracts, titles, introductions
+        return abstracts, titles
 
     def load_topics(self) -> List[str]:
         """

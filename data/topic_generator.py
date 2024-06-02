@@ -3,6 +3,10 @@ import transformers
 import torch
 # from unsloth import FastLanguageModel
 from typing import List
+from transformers import BitsAndBytesConfig
+import csv
+import pandas as pd
+from tqdm import tqdm
 
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 
@@ -26,11 +30,21 @@ class TopicGenerator:
 
 
         # model_name = "meta-llama/Llama-3-13b-hf"
-        model_name = "meta-llama/Meta-Llama-3-8B-Instruct"
+        # model_name = 'meta-llama/Meta-Llama-3-70B'
+        model_name = "meta-llama/Meta-Llama-3-70B-Instruct"
+        # model_name = "meta-llama/Llama-2-70b-chat-hf"
+        #model_name = "meta-llama/Meta-Llama-3-70B-Instruct"
         # model_name = "meta-llama/Llama-2-13b-chat-hf"
         # model_name = "meta-llama/Llama-2-7b-chat-hf"
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.model = AutoModelForCausalLM.from_pretrained(model_name).to("cuda")
+        # self.model = AutoModelForCausalLM.from_pretrained(model_name).to("cuda")
+        # Load the model with int8 precision
+        self.model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            load_in_4bit=True,  # Set to True for int4 # Set to True for int8
+            device_map="auto"   # This automatically places the model on the GPU
+        )
+        # quantization_config=BitsAndBytesConfig(load_in_8bit=True)
 
         # TODO: fix examples
         # self.few_shot_examples = """
@@ -67,9 +81,18 @@ class TopicGenerator:
         [/INST]
         """
 
+    def extract_topic(self, output_text: str, start_marker: str, end_marker: str) -> str:
+
+        start = output_text.find(start_marker) + len(start_marker)
+        end = len(output_text) if end_marker is None else output_text.find(end_marker, start)
+        
+        if start == -1 + len(start_marker) or end == -1 or start >= end:
+            return ""
+        
+        return output_text[start:end].strip()
 
 
-    def generate_topic(self, abstract: str, introduction: str) -> str:
+    def generate_topic(self, abstract: str) -> str:
         """
         Generates a topic for a given abstract and introduction.
 
@@ -149,7 +172,12 @@ class TopicGenerator:
         
         generated_ids = self.model.generate(inputs.input_ids.cuda(), max_new_tokens=256, do_sample=True, top_p=0.95, temperature=0.8)
         topic = self.tokenizer.batch_decode(generated_ids)[0]
-        print('topiccc:', topic)
+        # print('topiccc:', topic)
+
+        start_marker = '<|start_header_id|>assistant<|end_header_id|>'
+        end_marker = '<|eot_id|>'
+        topic = self.extract_topic(topic, start_marker, end_marker)
+        print('topic:', topic)
 
         #outputs = self.model.generate(input_ids=inputs["input_ids"].to("cuda"), attention_mask=inputs["attention_mask"], max_new_tokens=50, pad_token_id=self.tokenizer.eos_token_id)
         #output_text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
@@ -172,7 +200,7 @@ class TopicGenerator:
         # return output_text.strip()
         return topic
 
-    def generate_topics(self, abstracts: List[str], introductions: List[str]) -> List[str]:
+    def generate_topics(self, abstracts: List[str]) -> List[str]:
         """
         Generates topics for a list of abstracts and introductions.
 
@@ -184,7 +212,24 @@ class TopicGenerator:
             list: List of generated topics.
         """
         topics = []
-        for abstract, introduction in zip(abstracts, introductions):
-            topic = self.generate_topic(abstract, introduction)
+        for abstract in tqdm(abstracts):
+            topic = self.generate_topic(abstract)
             topics.append(topic)
+
+        # # # Write abstracts and topics to a CSV file
+        # output_csv_file = 'generated_topics_20k.csv'
+        # with open(output_csv_file, mode='w', newline='') as file:
+        #     writer = csv.writer(file)
+        #     writer.writerow(['Abstract', 'Topic'])  # Writing the header
+        #     writer.writerows(topics)  # Writing the data
+
+
+        # Create a DataFrame with abstracts and topics
+        data = {'Abstract': abstracts, 'Topic': topics}
+        df = pd.DataFrame(data)
+        
+        # Write the DataFrame to a CSV file
+        output_csv_file = 'generated_topics_15k_16k.csv'
+        df.to_csv(output_csv_file, index=False)
+
         return topics

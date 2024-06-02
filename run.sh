@@ -1,6 +1,6 @@
 srun -K --ntasks=1 --gpus-per-task=1 \
 --cpus-per-gpu=4 \
--p A100-80GB \
+-p H100 \
 --mem=512G \
 --container-mounts=/netscratch:/netscratch,/ds:/ds,`pwd`:`pwd` \
 --container-image=/netscratch/enroot/nvcr.io_nvidia_pytorch_23.06-py3.sqsh \
@@ -9,7 +9,7 @@ srun -K --ntasks=1 --gpus-per-task=1 \
 --mail-type=ALL \
 --mail-user=ankit.agrawal@dfki.de \
 --job-name debug \
---time=300 \
+--time=500 \
 --pty bash
 
 
