@@ -54,10 +54,13 @@ lama_topic_modeling/
 |   ├── init.py  
 |   └── argument_parser.py 
 |  
-├── main.py
+├── main_generate_labels.py (Main code for generating labels for training)
+├── main_finetune_model.py (Main code for finetuning)
+├── main_evaluate.py (Main code for evaluating models)
 ├── requirements.txt
 ├── run.sh
 ├── Topic_modeling_documentation_ankit.pdf
+├── Dockerfile
 └── README.md
 ```
 
@@ -87,13 +90,36 @@ lama_topic_modeling/
 
 2. **Update config**; Update different training parameters if needed at config.yaml.
 
-3. **Train the Model**: Generate label from teacher model and use it to train the student model by the following scripts: 
+3. **Generate labels**: Generate label from teacher model 
     ```bash
-    python main.py
+    python main_generate_labels.py
     ```
 
-This will run the teacher model, save the labels in csv file (so that it can be directly used later without running the teacher model again). Next it will finetune the student model and generate inference for the test set. 
+4. **Finetune model**: Finetune the student model based on data generated using teacher model
+    ```bash
+    python main_finetune_model.py
+    ```
+
+5. **Evaluate models**: Evaluate the finetuned model for the test set using BLEU and ROUGE scores. 
+
+  ```bash
+  python main_evaliuate.py
+  ```  
+
+
+This will run the teacher model, save the labels in csv file and also upload to huggingface hub datasets (Step-3).   
+Next in step-4, we start finetune the student model and save the model locally and also push model to huggingface hub. 
+
 BLUE and ROUGE scores for the test set is computed.
+
+
+
+6. ** Docker**: To use via docker, edit the Dockerfile as per the run requirement.
+    ```bash
+    docker build -t fine_tuning_image .
+     
+    docker run --gpus all -e HF_TOKEN=hugging_face_token -v /host/path:/container/path --rm -it fine_tuning_image
+    ```
 
 
 ---
@@ -103,9 +129,9 @@ The table below presents the performance (BLEU and ROUGE scores) of our models:
 
 Model                              |    BLUE    |  ROUGE  |
 -----------------------------------|------------|---------|
-Llama-3-8B-Instruct (Pre-trained)  |  xx.xx     |  xx.xx  |
-Llama-3-8B-Instruct (Few-shot)     |  xx.xx     |  xx.xx  |
-Llama-3-8B-Instruct (Fine-tuned)   |  xx.xx     |  xx.xx  |
+Llama-3-8B-Instruct (Pre-trained)  |  42.11     |  51.58  |
+Llama-3-8B-Instruct (Few-shot)     |  39.83     |  53.91  |
+Llama-3-8B-Instruct (Fine-tuned)   |  44.44     |  53.13  |
 
 ---
 ## Resource Analysis (TBD)
@@ -118,16 +144,16 @@ Llama-3-8B-Instruct (Fine-tuned)   |  xx.xx     |  xx.xx  |
 ### GPU Utilization
 
 - **Teacher Model (Llama-3-70B-Instruct)**
-  - **GPU Memory Required**: XX GB
-  - **Inference Time**: XX ms/sample
+  - **GPU Memory Required**: 42.8 GB
+  - **Inference Time**: 1.2 s/sample
 
 - **Student Model (Llama-3-8B-Instruct)**
   - **Fine-tuning**:
-    - **GPU Memory Required**: XX GB
-    - **Total Training Time**: XX hours
+    - **GPU Memory Required**: 33.8 GB (batch size: 4)
+    - **Total Training Time**: 90 mins (15k samples)
   - **Inference**:
-    - **GPU Memory Required**: XX GB
-    - **Inference Time**: XX ms/sample
+    - **GPU Memory Required**: 32.7 GB
+    - **Inference Time**: 0.4 s/sample
 
 ---
 

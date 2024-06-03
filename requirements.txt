@@ -1,30 +1,21 @@
+torch
 datasets
 transformers
 bitsandbytes
 accelerate
 peft
 wandb
+trl
 bertopic
 xformers
 adjustText
-
-#transformers==4.11.3
-#torch==1.10.0
-#datasets==1.15.1
-#unslot
-#sklearn
+scikit-learn
+rouge
+sacrebleu
+evaluate
 
 
-#torch==1.12.0+cu113
-#torch-cluster==1.6.0+pt112cu113
-#torch-geometric==2.2.0
-#torch-scatter==2.1.0+pt112cu113
-#torch-sparse==0.6.15+pt112cu113
-#torch-spline-conv==1.2.1+pt112cu113
-#torchvision==0.13.0+cu113
-#test
-
-#pip install "unsloth[cu121-ampere] @ git+https://github.com/unslothai/unsloth.git"
+# pip install "unsloth[cu121-ampere] @ git+https://github.com/unslothai/unsloth.git"
 # pip install "unsloth[cu124-ampere-torch230] @ git+https://github.com/unslothai/unsloth.git"
 # pip install datasets transformers bitsandbytes accelerate peft wandb xformers
 # pip install datasets transformers bitsandbytes accelerate peft wandb trl

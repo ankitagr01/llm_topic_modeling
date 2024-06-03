@@ -1,8 +1,8 @@
 model:
   teacher_model_name: "unslot/llama-70b"
-  teacher_model_name: "unsloth/llama-3-70b-bnb-4bit"
-  student_model_name: "unslot/llama-3-8b-bnb-4bit"
-  max_seq_length: 512
+  teacher_model_name: "meta-llama/Meta-Llama-3-70B-Instruct"
+  student_model_name: "meta-llama/Meta-Llama-3-8B-Instruct"
+  max_seq_length: 2048
   load_in_4bit: True
   bnb_4bit_quant_type: "nf4"
   bnb_4bit_use_double_quant: True
@@ -31,7 +31,12 @@ training:
 
 data:
   dataset_name: "CShorten/ML-ArXiv-Papers"
+  train_data_name: "ankitagr01/dynamic_topic_modeling_arxiv_abstracts"
+  test_data_name: "ankitagr01/dynamic_topic_modeling_arxiv_abstract_1k"
   test_size: 0.05
   val_size: 0.1
   generated_topics_file: "generated_topics.csv"
 
+eval:
+  fewshot: False
+  eval_model_name: "ankitagr01/llama_3_8b_ft_topic_new"
