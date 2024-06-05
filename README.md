@@ -6,7 +6,9 @@ This project focuses on topic modeling for abstracts of papers from the CShorten
 
 ## Approach
 
-We employ a knowledge distillation approach to generate high-quality training data and use a smaller fine-tuned model for inference, which performs similarly to the large teacher model.
+We employ a knowledge distillation approach to generate high-quality training data and use a smaller fine-tuned model for inference, which performs similarly to the large teacher model.  
+For finetuning the Llama-3-8b model, we use ROUGE as a custom metric instead of the default cross-entropy loss by the SFT Trainer. 
+
 
 ---
 
@@ -134,7 +136,7 @@ Llama-3-8B-Instruct (Few-shot)     |  39.83     |  53.91  |
 Llama-3-8B-Instruct (Fine-tuned)   |  44.44     |  53.13  |
 
 ---
-## Resource Analysis (TBD)
+## Resource Analysis:
 
 ### GPU Used
 - **A100-80GB**
@@ -160,11 +162,16 @@ Llama-3-8B-Instruct (Fine-tuned)   |  44.44     |  53.13  |
 ## Improvements
 
 - Hyperparameter tuning
-- Prompt tuning (zero-shot/few-shot)
+- Prompt tuning (one-shot/few-shot)
 - Incorporating human evaluation and feedback
+- Comparison with other open-source LLMs (Gemma, Mistral)
+- Using custom embedding-based metrics for training and eval. (Similarity score or distance between embeddings between predicted and ground-truth topic)
 - Expanding training data to more domains for better generalization
 - Enhancing documentation using Doxygen
 - Scalability improvements using multiprocessing or multiple GPUs
+- Using Unsloth package for faster inference and stable finetuning.
+- Using GGUF version of Llama-3-8b for finetuning. This has proven to achieve better finetuning results.
+- Using flash attention
 
 ---
 
