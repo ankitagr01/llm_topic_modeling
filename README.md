@@ -164,6 +164,7 @@ Llama-3-8B-Instruct (Fine-tuned)   |  44.44     |  53.13  |
 - Hyperparameter tuning
 - Prompt tuning (one-shot/few-shot)
 - Incorporating human evaluation and feedback
+- Large training set needed for effective fineutning of Llama-3.  
 - Comparison with other open-source LLMs (Gemma, Mistral)
 - Using custom embedding-based metrics for training and eval. (Similarity score or distance between embeddings between predicted and ground-truth topic)
 - Expanding training data to more domains for better generalization
