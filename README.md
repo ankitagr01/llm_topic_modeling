@@ -20,7 +20,7 @@ For finetuning the Llama-3-8b model, we use ROUGE as a custom metric instead of 
 ---
 ## Evaluation
 
-The performance of the models is evaluated using BLEU-3 and ROUGE scores.
+The performance of the models is evaluated using BLEU-3 and ROUGE and similarity scores.
 
 ---
 ## Project Structure
@@ -75,17 +75,49 @@ lama_topic_modeling/
     cd llama_topic_modeling
     ```
 
-2. Create a virtual environment and activate it:
+2. Create a virtual environment and activate it: (Python version:  3.9 or newer)
     ```bash
     python -m venv venv
     source venv/bin/activate  # On Windows use `venv\Scripts\activate`
     ```
 
-3. Install the required packages:
+3. Install PyTorch with the appropriate CUDA version.  
+
+   First, check your CUDA version.
+    ```bash
+    nvcc --version
+    ```
+    
+   If `nvcc` is not available, you can check the CUDA version via the NVIDIA driver:
+    ```bash
+    nvidia-smi
+    ```
+   The CUDA version will be displayed at the top of the output.
+
+   Then, visit the [PyTorch installation page](https://pytorch.org/get-started/locally/) to get the correct installation command for your CUDA version. A minimum PyTorch version 2.0 is required.
+
+   For example, for CUDA 11.6:
+    ```bash
+    pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
+    ```
+
+   For CUDA 11.7:
+    ```bash
+    pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu117
+    ```
+5. Verify the installation:
+    ```bash
+        python -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
+    ```  
+    This should print the PyTorch version (2.0 or higher) and return `True` if CUDA is properly installed and configured.
+   
+  
+5. Install the required packages:
     ```bash
     pip install -r requirements.txt
     ```
 ---
+
 ## Usage
 
 1. **HuggingFace token**: Put your huggingface token in /main.py which will be used to download the llama-3 models.
@@ -129,11 +161,11 @@ BLUE and ROUGE scores for the test set is computed.
 ## 4. Results
 The table below presents the performance (BLEU and ROUGE scores) of our models:
 
-Model                              |    BLUE    |  ROUGE  |
------------------------------------|------------|---------|
-Llama-3-8B-Instruct (Pre-trained)  |  42.11     |  51.58  |
-Llama-3-8B-Instruct (Few-shot)     |  39.83     |  53.91  |
-Llama-3-8B-Instruct (Fine-tuned)   |  44.44     |  53.13  |
+Model                              |    BLUE    |  ROUGE  | Similarity Score |
+-----------------------------------|------------|---------|------------------|
+Llama-3-8B-Instruct (Pre-trained)  |  42.11     |  51.58  |       72.47      |
+Llama-3-8B-Instruct (Few-shot)     |  39.83     |  53.91  |       77.29      |
+Llama-3-8B-Instruct (Fine-tuned)   |  44.44     |  53.13  |       74.37      |
 
 ---
 ## Resource Analysis:
