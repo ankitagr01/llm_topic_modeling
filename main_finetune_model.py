@@ -38,7 +38,7 @@ torch.backends.cudnn.benchmark = False
 
 
 # Add your Hugging Face token to the environment variables
-os.environ['HF_TOKEN'] = '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'
+os.environ['HF_TOKEN'] = INSERT_YOUR_HF_TOKEN_HERE
 
 
 def initialize_wandb():
