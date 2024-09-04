@@ -26,7 +26,7 @@ seed(42)
 
 
 # Add your Hugging Face token to the environment variables
-os.environ['HF_TOKEN'] = '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'
+os.environ['HF_TOKEN'] = 'INSERT_YOUR_HF_TOKEN_HERE'
 
 
 # Load dataset from the hub
