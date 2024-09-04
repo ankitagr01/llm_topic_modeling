@@ -24,7 +24,7 @@ from huggingface_hub import notebook_login, login
 # notebook_login()
 
 # !huggingface-cli login
-login(token='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')
+login(token='INSERT_YOUR_HF_TOKEN_HERE')
 
 
 # set quantization configuration to load large model with less GPU memory
